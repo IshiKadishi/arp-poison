@@ -1,0 +1,12 @@
+use pnet_datalink;
+
+fn main() {
+    let interfaces = pnet_datalink::interfaces();
+
+    for interface in interfaces {
+        println!(
+            "Interface: {} | MAC: {:?} | IPs: {:?}",
+            interface.name, interface.mac, interface.ips
+        );
+    }
+}

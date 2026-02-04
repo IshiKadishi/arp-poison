@@ -1,0 +1,10 @@
+[package]
+name = "arp-poison"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4.5.57", features = ["derive"] }
+pnet = "0.35"
+pnet_datalink = "0.35"
+pnet_packet = "0.35"
