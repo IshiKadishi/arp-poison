@@ -53,11 +53,29 @@ Windows calls this "IP Routing". You can enable it via PowerShell (Administrator
     netsh interface ipv4 set interface "Wi-Fi" forwarding=enabled
     ```
 
-### 3. Running the Tool
-Open PowerShell or CMD as Administrator.
+### 3. Finding Your Interface Name
+On Windows, interfaces use NPF device paths (e.g., `\Device\NPF_{GUID}`) instead of friendly names like "Ethernet" or "Wi-Fi".
+
+Use the `--list` flag to find your interface:
+```powershell
+.\arp-poison-windows-amd64.exe --list
+```
+
+Example output:
+```
+NAME                                          MAC                  DESCRIPTION
+----------------------------------------------------------------------------------------------------
+\Device\NPF_{06A578A5-8609-494F-95C7-9F6B6DD8786F} 00:15:5d:e4:06:26    Hyper-V Virtual Ethernet Adapter
+\Device\NPF_{BA8B0DB9-D651-44FF-BE3D-6EC6A6F896E2} 74:56:3c:be:fc:32    Realtek PCIe GbE Family Controller
+```
+
+**Tip**: Match the DESCRIPTION column to your adapter (check in Windows Settings > Network & Internet) or identify it by MAC address.
+
+### 4. Running the Tool
+Open PowerShell or CMD as Administrator. Use the full device path from `--list`:
 
 ```powershell
-.\arp-poison-windows-amd64.exe --interface "Wi-Fi" --target 192.168.1.50 --gateway 192.168.1.1
+.\arp-poison-windows-amd64.exe -i "\Device\NPF_{BA8B0DB9-D651-44FF-BE3D-6EC6A6F896E2}" -t 192.168.1.50 -g 192.168.1.1
 ```
 
 ---
