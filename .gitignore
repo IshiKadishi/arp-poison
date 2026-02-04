@@ -1,1 +1,13 @@
-/target
+# Build artifacts
+target/
+dist/
+
+# Cross-compilation stuff
+libs/
+Cross.toml
+
+# Build scripts (dev only)
+*.sh
+
+# Misc
+1
