@@ -11,7 +11,7 @@ Designed for educational purposes and red team engagements to perform targeted M
 
 ---
 
-## 🐧 Arch Linux Setup
+## 🐧 Linux Setup
 
 ### 1. Enable IP Forwarding
 By default, your kernel drops packets meant for other devices, causing a Denial of Service (DoS) for the victim. To act as a MITM router, you must enable forwarding.
