@@ -10,18 +10,22 @@ mod arp;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-    /// Network Interface to use (e.g, eth0, wlan0)
+    /// List available network interfaces and exit
     #[arg(short, long)]
-    interface: String,
+    list: bool,
+
+    /// Network Interface to use (e.g, eth0, wlan0)
+    #[arg(short, long, required_unless_present = "list")]
+    interface: Option<String>,
 
     /// Target IP(s) to spoof. Use multiple times or comma-separated.
     /// Example: -t 192.168.1.10,192.168.1.20
-    #[arg(short, long, value_delimiter = ',', num_args = 1..)]
-    targets: Vec<String>,
+    #[arg(short, long, value_delimiter = ',', num_args = 1.., required_unless_present = "list")]
+    targets: Option<Vec<String>>,
 
     /// Gateway IP (Router) to impersonate.
-    #[arg(short, long)]
-    gateway: String,
+    #[arg(short, long, required_unless_present = "list")]
+    gateway: Option<String>,
 
     /// Spoofing interval in seconds
     #[arg(long, default_value_t = 2)]
@@ -46,15 +50,31 @@ fn main() {
 
     let args = Args::parse();
 
-    let interface_name = &args.interface;
+    let interfaces = pnet_datalink::interfaces();
+
+    // Handle --list flag
+    if args.list {
+        println!("Available network interfaces:\n");
+        println!("{:<45} {:<20} {}", "NAME", "MAC", "DESCRIPTION");
+        println!("{}", "-".repeat(100));
+        for iface in &interfaces {
+            let mac = iface.mac.map(|m| m.to_string()).unwrap_or_else(|| "N/A".to_string());
+            let desc = iface.description.as_str();
+            println!("{:<45} {:<20} {}", iface.name, mac, desc);
+        }
+        return;
+    }
+
+    let interface_name = args.interface.as_ref().unwrap();
     let target_ips: Vec<Ipv4Addr> = args
         .targets
+        .as_ref()
+        .unwrap()
         .iter()
         .map(|t| t.parse().expect("Invalid Target IP address"))
         .collect();
-    let gateway_ip: Ipv4Addr = args.gateway.parse().expect("Invalid Gateway IP address");
+    let gateway_ip: Ipv4Addr = args.gateway.as_ref().unwrap().parse().expect("Invalid Gateway IP address");
 
-    let interfaces = pnet_datalink::interfaces();
     let result = interfaces
         .iter()
         .find(|iface| iface.name == *interface_name);
